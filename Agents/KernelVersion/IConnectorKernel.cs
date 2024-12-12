@@ -3,9 +3,9 @@ using Microsoft.SemanticKernel.Connectors.OpenAI;
 
 namespace SemanticKernelPersonalized.Agents.KernelVersion
 {
-    public interface IConnectorStandalone
+    public interface IConnectorKernel
     {
-        IChatCompletionService GetChatCompletionService();
+        public void CustomizeModel(string modelId);
         string GetModelId();
     }
 }
