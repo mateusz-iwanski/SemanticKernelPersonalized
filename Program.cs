@@ -8,7 +8,7 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
-using SemanticKernelPersonalized.Agents.OpenAi.KelnerVersion;
+using SemanticKernelPersonalized.Agents.KernelVersion.OpenAi;
 using SemanticKernelPersonalized.Builders;
 using SemanticKernelPersonalized.Settings;
 using System;
