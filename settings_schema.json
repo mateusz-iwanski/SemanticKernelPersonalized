@@ -1,0 +1,16 @@
+{
+  "SemanticKernel": {
+    "Access": {
+      "OpenAi": {
+        "ApiKey": "",
+        "OrganizationId": "",
+        "ServiceId": ""
+      },
+      "Firecrawl": {
+        "ApiKey": "",
+        "ApiUrl": "https://api.firecrawl.dev/v1/scrape",
+        "ApiMapUrl": "https://api.firecrawl.dev/v1/map"
+      }
+    }
+  }
+}
