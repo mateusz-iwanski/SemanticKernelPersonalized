@@ -74,9 +74,10 @@ namespace SemanticKernelPersonalized
             });
 
             //////
-
+            Console.WriteLine("Hello World!");
             var openai = host.Services.GetService<OpenAIKernel>();
-            await openai.GetResponseAsync("jaki kolor ma słońce");
+            var response = await openai.InvokeAsync("pobierz url z https://rtk.pl/onas/");
+            Console.WriteLine(response);
 
 
         }
