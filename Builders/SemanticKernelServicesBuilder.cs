@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
 using SemanticKernelPersonalized.Settings;
 using Microsoft.Extensions.Logging;
-using SemanticKernelPersonalized.Agents.OpenAi.KelnerVersion;
+using SemanticKernelPersonalized.Agents.KernelVersion.OpenAi;
 
 namespace SemanticKernelPersonalized.Builders
 {
