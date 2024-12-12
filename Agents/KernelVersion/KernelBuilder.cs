@@ -16,44 +16,89 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion
 {
     public class KernelBuilder
     {
-        private readonly OpenAISemanticSettings _accessOpenAi;
-
         public KernelBuilder() { return; }
 
-        public Kernel CreateKernelWithChatCompletion(
-            IOptions<OpenAISemanticSettings> openAISettings,
-            IOptions<FirecrawlSemanticSettings> firecrawlSemanticSettings
-        )
+        public Kernel CreateKernelWithOpenAIChatCompletion(
+            string modelId, 
+            string modelApiKey,
+            IOptions<FirecrawlSemanticSettings>? firecrawlSemanticSettings = null
+            )
         {
             var builder = Kernel.CreateBuilder();
 
-            AddChatCompletionToKernel(builder, openAISettings);
+            builder.AddOpenAIChatCompletion(
+                modelId,
+                modelApiKey
+               );
 
-            // add services
-            builder.Services.AddSingleton<IWebScraping, Firecrawl>();
-            builder.Services.AddSingleton<Firecrawl>();
-
-            // plugins
-            builder.Plugins.AddFromType<WebScrapingPlugin>("WebScrapping");
-
-
-            // add configuration
-            builder.Services.Configure<FirecrawlSemanticSettings>(options =>
-            {
-                options.ApiKey = firecrawlSemanticSettings.Value.ApiKey;
-                options.ApiUrl = firecrawlSemanticSettings.Value.ApiUrl;
-                options.ApiMapUrl = firecrawlSemanticSettings.Value.ApiMapUrl;
-            });
+            AddPlugins(
+                builder,
+                firecrawlSemanticSettings
+                );
 
             return builder.Build();
+
         }
 
-        public void AddChatCompletionToKernel(IKernelBuilder builder, IOptions<OpenAISemanticSettings> access)
+        private void AddPlugins(
+            IKernelBuilder builder,
+            IOptions<FirecrawlSemanticSettings>? firecrawlSemanticSettings
+            )
         {
-            builder.AddOpenAIChatCompletion(
-                access.Value.DefaultModelId,
-                access.Value.ApiKey
-                );
+            if (firecrawlSemanticSettings != null)
+            {
+                // add configuration
+                builder.Services.Configure<FirecrawlSemanticSettings>(options =>
+                {
+                    options.ApiKey = firecrawlSemanticSettings.Value.ApiKey;
+                    options.ApiUrl = firecrawlSemanticSettings.Value.ApiUrl;
+                    options.ApiMapUrl = firecrawlSemanticSettings.Value.ApiMapUrl;
+                });
+
+                // add services
+                builder.Services.AddSingleton<IWebScraping, Firecrawl>();
+                builder.Services.AddSingleton<Firecrawl>();
+
+                // plugins
+                builder.Plugins.AddFromType<WebScrapingPlugin>("WebScrapping");
+            }
         }
+
+        //public Kernel CreateKernelWithChatCompletion(
+        //    IOptions<FirecrawlSemanticSettings> firecrawlSemanticSettings,
+        //    string modelId,
+        //    string apiKey
+        //    )
+        //{
+        //    var builder = Kernel.CreateBuilder();
+
+        //    AddChatCompletionToKernel(builder, modelId, apiKey);
+
+
+        //    // add services
+        //    builder.Services.AddSingleton<IWebScraping, Firecrawl>();
+        //    builder.Services.AddSingleton<Firecrawl>();
+
+        //    // plugins
+        //    builder.Plugins.AddFromType<WebScrapingPlugin>("WebScrapping");
+
+        //    // add configuration
+        //    builder.Services.Configure<FirecrawlSemanticSettings>(options =>
+        //    {
+        //        options.ApiKey = firecrawlSemanticSettings.Value.ApiKey;
+        //        options.ApiUrl = firecrawlSemanticSettings.Value.ApiUrl;
+        //        options.ApiMapUrl = firecrawlSemanticSettings.Value.ApiMapUrl;
+        //    });
+
+        //    return builder.Build();
+        //}
+
+        //public void AddChatCompletionToKernel(IKernelBuilder builder, string modelId, string apiKey)
+        //{            
+        //    builder.AddOpenAIChatCompletion(
+        //        modelId,
+        //        apiKey
+        //        );
+        //}
     }
 }
