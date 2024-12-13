@@ -5,7 +5,6 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using SemanticKernelPersonalized.History;
 using SemanticKernelPersonalized.AgentsManagement;
 using SemanticKernelPersonalized.Agents.KernelVersion;
-using SemanticKernelPersonalized.Agents.StandalobeVersion;
 using SemanticKernelPersonalized.Agents;
 
 /// <summary>
@@ -20,8 +19,7 @@ using SemanticKernelPersonalized.Agents;
 /// </example>
 public class ChatDialogStandAlone : ChatDialogBase, IChatDialogBase
 {
-    private readonly IConnectorStandalone _connector;
-    private ChatHistory _chatHistory { get; set; }
+    private readonly IConnector _connector;
 
     public readonly Guid Uuid;
 
@@ -30,7 +28,7 @@ public class ChatDialogStandAlone : ChatDialogBase, IChatDialogBase
     /// </summary>
     /// <param name="connector">The connector to use for chat completion (OpenAiStandalone, Mistral, etc.).</param>
     /// <param name="logger">The logger to use for logging.</param>
-    public ChatDialogStandAlone(IConnectorStandalone connector, ILogger<ChatDialogStandAlone> logger) : base(logger)
+    public ChatDialogStandAlone(IConnector connector, ILogger<ChatDialogStandAlone> logger) : base(logger)
             => _connector = connector;    
 
     /// <summary>
@@ -40,10 +38,7 @@ public class ChatDialogStandAlone : ChatDialogBase, IChatDialogBase
     /// <param name="kernel"></param>
     /// <returns></returns>
     /// <exception cref="InvalidOperationException"></exception>
-    protected override async Task<ChatMessageContent> Chat(
-        PromptExecutionSettings? promptExecutionSettings = null, 
-        Kernel? kernel = null
-        )
+    protected override async Task<ChatMessageContent> Chat()
     {
         var chatCompletionService = _connector.GetChatCompletionService();
         if (chatCompletionService == null)
@@ -58,8 +53,8 @@ public class ChatDialogStandAlone : ChatDialogBase, IChatDialogBase
 
         var response = await chatCompletionService.GetChatMessageContentAsync(
             chatHistory: _chatHistory,
-            executionSettings: promptExecutionSettings,
-            kernel: kernel
+            executionSettings: _connector.GetPromptExecutionSettings(),
+            kernel: null
             );
 
         return response;
@@ -81,6 +76,6 @@ public class ChatDialogStandAlone : ChatDialogBase, IChatDialogBase
     /// Gets the connector used for chat completion.
     /// </summary>
     /// <returns>The connector instance.</returns>
-    public IConnectorStandalone GetConnector() => _connector;
+    public IConnector GetConnector() => _connector;
 
 }
