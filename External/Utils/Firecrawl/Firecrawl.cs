@@ -88,12 +88,39 @@ public class Firecrawl : IWebScraping
         }
     }
 
-    public async Task<string> MapPageAsync(string url, string? search = null)
+    /// <summary>
+    /// Maps a webpage starting from the specified URL with optional search query and additional parameters.
+    /// </summary>
+    /// <param name="url">The base URL to start crawling from.</param>
+    /// <param name="search">Search query to use for mapping. Limited to 1000 search results during the Alpha phase.</param>
+    /// <param name="ignoreSitemap">Ignore the website sitemap when crawling. Default is false.</param>
+    /// <param name="sitemapOnly">Only return links found in the website sitemap. Default is false.</param>
+    /// <param name="includeSubdomains">Include subdomains of the website. Default is false.</param>
+    /// <param name="limit">Maximum number of links to return. Required range: x < 5000. Default is 5000.</param>
+    /// <returns>A task that represents the asynchronous operation. The task result contains the mapped page content as a string.</returns>
+    /// <exception cref="HttpRequestException">Thrown when the HTTP request fails.</exception>
+    public async Task<string> MapPageAsync(
+        string url,
+        string? search = null,
+        bool ignoreSitemap = false,
+        bool sitemapOnly = false,
+        bool includeSubdomains = false,
+        int limit = 5000
+    )
     {
+        if (limit > 5000)
+        {
+            throw new ArgumentOutOfRangeException(nameof(limit), "Limit must be less than or equal to 5000.");
+        }
+
         var payload = new
         {
             url = url,
-            search = search ?? ""
+            search = search ?? "",
+            ignoreSitemap = ignoreSitemap,
+            sitemapOnly = sitemapOnly,
+            includeSubdomains = includeSubdomains,
+            limit = limit
         };
 
         var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
