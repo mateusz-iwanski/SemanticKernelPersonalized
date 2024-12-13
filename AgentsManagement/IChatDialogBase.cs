@@ -12,8 +12,7 @@ namespace SemanticKernelPersonalized.AgentsManagement
     public interface IChatDialogBase
     {
         void AddSystemMessage(
-            string message,
-            ChatDialogBase dialog,
+            string message,            
             Dictionary<string, object>? messageAdditionalMetadata = null,
             string? source = null,
             string? name = null,
