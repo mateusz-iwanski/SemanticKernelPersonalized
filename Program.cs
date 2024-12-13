@@ -1,4 +1,5 @@
-﻿using Azure.Monitor.OpenTelemetry.Exporter;
+﻿using Azure;
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -8,7 +9,10 @@ using OpenTelemetry;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 using OpenTelemetry.Trace;
+using SemanticKernelPersonalized.Agents.KernelVersion;
 using SemanticKernelPersonalized.Agents.KernelVersion.OpenAi;
+using SemanticKernelPersonalized.Agents.Standalone.OpenAi;
+using SemanticKernelPersonalized.AgentsManagement;
 using SemanticKernelPersonalized.Builders;
 using SemanticKernelPersonalized.Settings;
 using System;
@@ -17,6 +21,8 @@ namespace SemanticKernelPersonalized
 {
     internal class Program
     {
+        public static Guid SESSION_UUID = Guid.NewGuid();
+
         public static async Task Main(string[] args)
         {
             var host = Host.CreateDefaultBuilder(args)
@@ -42,7 +48,20 @@ namespace SemanticKernelPersonalized
 
             var resourceBuilder = ResourceBuilder
                 .CreateDefault()
-                .AddService("TelemetryApplicationInsightsQuickstart");
+                .AddService(
+                    serviceName: "TelemetryApplicationInsightsQuickstart",
+                    serviceInstanceId: SESSION_UUID.ToString()  // this is "Role Instance" in Application Insights
+                    );
+
+             //.AddService( "YourNewServiceName",
+             //   serviceNamespace: "YourNamespace",
+             //   serviceVersion: "1.0.0",
+             //   serviceInstanceId: Guid.NewGuid().ToString(),
+             //   attributes: new Dictionary<string, object>
+             //   {
+             //       ["environment"] = "production",
+             //       ["deployment.region"] = "west-europe"
+             //   });
 
             // Enable model diagnostics with sensitive data.
             AppContext.SetSwitch("Microsoft.SemanticKernel.Experimental.GenAI.EnableOTelDiagnosticsSensitive", true);
@@ -75,10 +94,41 @@ namespace SemanticKernelPersonalized
 
             //////
             Console.WriteLine("Hello World!");
-            var openai = host.Services.GetService<OpenAIKernel>();
-            var response = await openai.InvokeAsync("pobierz url z https://rtk.pl/onas/");
-            Console.WriteLine(response);
 
+            var openai = host.Services.GetService<OpenAIKernel>();
+            var logger = host.Services.GetRequiredService<ILogger<ChatDialog>>();
+            ChatDialog chatDialogKernel = new ChatDialog(openai, logger);
+            chatDialogKernel.AddSystemMessage("You are helpful assistant.");
+            var k = await chatDialogKernel.GetChatMessageContentAsync("pobierz url z www.rtk.pl");
+            Console.WriteLine("Assistant: " + k.Content);
+
+            Console.CancelKeyPress += (sender, e) =>
+            {
+                e.Cancel = true;
+                Environment.Exit(0);
+            };
+
+            while (true)
+            {
+                Console.Write("User: ");
+                var userInput = Console.ReadLine();
+                if (string.IsNullOrEmpty(userInput)) continue;
+
+                var response = await chatDialogKernel.GetChatMessageContentAsync(userInput);
+                Console.WriteLine("Assistant: " + response.Content);
+            }
+
+
+
+            //var k = await chatDialogKernel.GetChatMessageContentAsync("what i the color of the sun");
+
+            //var openai = host.Services.GetService<OpenAiStandalone>();
+            //var logger = host.Services.GetRequiredService<ILogger<ChatDialog>>();
+            //ChatDialog chatDialogStandAlone = new ChatDialog(openai, logger);
+            //chatDialogStandAlone.AddSystemMessage("You are helpful assistant.");
+            //var k = await chatDialogStandAlone.GetChatMessageContentAsync("pobierz url z https://rtk.pl/onas/");
+
+            Console.WriteLine(k.Content);
 
         }
     }
