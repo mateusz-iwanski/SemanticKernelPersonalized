@@ -11,6 +11,7 @@ using Microsoft.SemanticKernel;
 using SemanticKernelPersonalized.Settings;
 using Microsoft.Extensions.Logging;
 using SemanticKernelPersonalized.Agents.KernelVersion.OpenAi;
+using SemanticKernelPersonalized.Agents.Standalone.OpenAi;
 
 namespace SemanticKernelPersonalized.Builders
 {
@@ -37,7 +38,7 @@ namespace SemanticKernelPersonalized.Builders
             //services.AddSingleton<IDependencyConnectorFactory, DependencyConnectorFactory>();
 
             // Add services
-            //services.AddScoped<OpenAiStandalone>();
+            services.AddScoped<OpenAiStandalone>();
             services.AddScoped<OpenAIKernel>();
 
         }
