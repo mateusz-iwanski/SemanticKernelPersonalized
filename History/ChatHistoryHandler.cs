@@ -37,16 +37,16 @@ namespace SemanticKernelPersonalized.History
             ChatDialogBase dialog,
             AuthorRole role,
             string message,
-            Dictionary<string, object>? messageAdditionalMetadata = null,
+            Dictionary<string, object?>? messageAdditionalMetadata = null,
             string? source = null,
             string? name = null,
             string? mimeType = null,
             string author = "unknown")
         {
             // TODO: Add LogRecord.TraceId - look : https://learn.microsoft.com/en-us/semantic-kernel/concepts/enterprise-readiness/observability/telemetry-with-console?tabs=Powershell-CreateFile%2CEnvironmentFile&pivots=programming-language-csharp
-            chatHistory.Add(new()
-            {
-                Role = AuthorRole.User,
+            chatHistory.Add(new ChatMessageContent()
+            { 
+                Role = role,
                 MimeType = mimeType,
                 Metadata = HistoryMetadataBuilder.MessageContent(
                     dialog: dialog,
@@ -122,7 +122,7 @@ namespace SemanticKernelPersonalized.History
 
             chatHistory.Add(new()
             {
-                Role = AuthorRole.User,
+                Role = role,
                 MimeType = "url",
                 Metadata = HistoryMetadataBuilder.MessageContent(
                     dialog: dialog,
