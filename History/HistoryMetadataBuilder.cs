@@ -13,23 +13,29 @@ namespace SemanticKernelPersonalized.History
         public static IReadOnlyDictionary<string, object?> MessageContent(
             ChatDialogBase dialog,
             string author,
-            Dictionary<string, object>? additionalMetaData = null,
+            Dictionary<string, object?>? additionalMetaData = null,
             string? source = null,
             string? name = null
             )
         {
             var metadata = new Dictionary<string, object?>
-            {
-                { "uuid", Guid.NewGuid().ToString() },
-                { "conversation_uuid", dialog.GetUuid().ToString() },
-                { "modelId", dialog.GetModelId() },
-                { "createAt", DateTime.Now.ToString() },
-                { "source", source },
-                { "name", name },
-                { "author", author }
-            };
+                {
+                    { "uuid", Guid.NewGuid().ToString() },
+                    { "conversation_uuid", dialog.GetUuid().ToString() },
+                    { "modelId", dialog.GetModelId() },
+                    { "createAt", DateTime.Now.ToString() },
+                    { "source", source },
+                    { "name", name },
+                    { "author", author }
+                };
 
-            if (additionalMetaData != null) metadata.Concat(additionalMetaData).ToDictionary(x => x.Key, x => x.Value);
+            if (additionalMetaData != null)
+            {
+                foreach (var item in additionalMetaData)
+                {
+                    metadata[item.Key] = item.Value;
+                }
+            }
 
             return metadata;
         }
@@ -40,10 +46,10 @@ namespace SemanticKernelPersonalized.History
             )
         {
             var metadata = new Dictionary<string, object?>
-            {
-                { "uuid", Guid.NewGuid().ToString() },
-                { "conversation_uuid", dialog.GetUuid().ToString() },
-            };
+                {
+                    { "uuid", Guid.NewGuid().ToString() },
+                    { "conversation_uuid", dialog.GetUuid().ToString() },
+                };
 
             return metadata;
         }
