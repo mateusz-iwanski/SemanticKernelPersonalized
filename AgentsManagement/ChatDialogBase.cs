@@ -13,19 +13,18 @@ namespace SemanticKernelPersonalized.AgentsManagement
     public abstract class ChatDialogBase
     {
         protected ChatHistory _chatHistory { get; set; }
+        protected ILogger<IChatDialogBase> _logger { get; set; }
 
         public readonly Guid Uuid;
 
-        public ChatDialogBase(ILogger<ChatDialogStandAlone> logger)
+        public ChatDialogBase(ILogger<IChatDialogBase> logger)
         {
             _chatHistory = new ChatHistory();
+            _logger = logger;
             Uuid = Guid.NewGuid();
         }
 
-        abstract protected Task<ChatMessageContent> Chat(
-            PromptExecutionSettings? promptExecutionSettings = null,
-            Kernel? kernel = null
-            );
+        abstract protected Task<ChatMessageContent> Chat();
 
         abstract public string GetModelId();
 
@@ -67,14 +66,16 @@ namespace SemanticKernelPersonalized.AgentsManagement
                );
 
             // Get response from the chat completion service
-            var response = await Chat(promptExecutionSettings, kernel);
+            var response = await Chat();
+            // this will be used to store the response id
+            object? agentAiResponseId = response.Metadata["Id"];
 
             // Add assistant message to the chat history
             addMessage(
                 AuthorRole.Assistant,
                 response.Content, // Fix: Use response.Content instead of response
                 this,
-                null,
+                new Dictionary<string, object?>() { { "gen_ai.response.id", agentAiResponseId } },
                 GetModelId(),
                 name,
                 mimeType,
@@ -97,7 +98,7 @@ namespace SemanticKernelPersonalized.AgentsManagement
             AuthorRole role,
             string message,
             ChatDialogBase dialog,
-            Dictionary<string, object>? messageAdditionalMetadata = null,            
+            Dictionary<string, object?>? messageAdditionalMetadata = null,            
             string? source = null,
             string? name = null,
             string? mimeType = null,
@@ -117,9 +118,8 @@ namespace SemanticKernelPersonalized.AgentsManagement
                 );
         }
         public virtual void AddSystemMessage(
-            string message,
-            ChatDialogBase dialog,
-            Dictionary<string, object>? messageAdditionalMetadata = null,
+            string message,            
+            Dictionary<string, object?>? messageAdditionalMetadata = null,
             string? source = null,
             string? name = null,
             string? mimeType = null,
@@ -136,7 +136,7 @@ namespace SemanticKernelPersonalized.AgentsManagement
                 mimeType,
                 author
                 );
-        }
+        }        
 
         /// <summary>
         /// Clears the chat history.
@@ -153,5 +153,6 @@ namespace SemanticKernelPersonalized.AgentsManagement
         /// Gets the UUID.
         /// </summary>
         public virtual Guid GetUuid() => Uuid;
+
     }
 }
