@@ -27,10 +27,14 @@ namespace SemanticKernelPersonalized.Plugins.WebScrapping
         [Description("Map a website url and get all the urls on the website (extremely fast).")]
         public async Task<string> MapPageAsync(
             [Description("Url/Link/Uri page to scrap")] string url,
-            [Description("Filter for search")] string? search = null
+            [Description("Filter for search")] string? search = null,
+            [Description("Ignore the website sitemap when crawling. Default is false.")] bool ignoreSitemap = false,
+            [Description("Only return links found in the website sitemap. Default is false.")] bool sitemapOnly = false,
+            [Description("Include subdomains of the website. Default is false.")] bool includeSubdomains = false,
+            [Description("Maximum number of links to return. Required range: x < 5000. Default is 5000.")] int limit = 5000
             )
         {
-            return await webSpracping.MapPageAsync(url, search);
+            return await webSpracping.MapPageAsync(url, search, ignoreSitemap, sitemapOnly, includeSubdomains, limit);
         }
 
 
