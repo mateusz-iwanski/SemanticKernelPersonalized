@@ -98,8 +98,10 @@ namespace SemanticKernelPersonalized
             var openai = host.Services.GetService<OpenAIKernel>();
             var logger = host.Services.GetRequiredService<ILogger<ChatDialog>>();
             ChatDialog chatDialogKernel = new ChatDialog(openai, logger);
-            chatDialogKernel.AddSystemMessage("You are helpful assistant.");
-            var k = await chatDialogKernel.GetChatMessageContentAsync("pobierz url z www.rtk.pl");
+            //chatDialogKernel.AddSystemMessage("You are helpful assistant.");
+            //var k = await chatDialogKernel.GetChatMessageContentAsync("pobierz url z www.rtk.pl/onas");
+            var k = await chatDialogKernel.GetChatMessageContentAsync("pobierz treść strony z www.rtk.pl/onas w formacie json");
+            //var k = await chatDialogKernel.GetChatMessageContentAsync("show registered plugins");
             Console.WriteLine("Assistant: " + k.Content);
 
             Console.CancelKeyPress += (sender, e) =>
