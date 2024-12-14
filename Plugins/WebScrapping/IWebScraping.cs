@@ -2,7 +2,21 @@
 {
     public interface IWebScraping
     {
-        Task<string> ScrapingPageAsync(string url);
+        Task<string> ScrapingPageAsync(
+            string url,
+            string[]? formats = null,
+            bool onlyMainContent = true,
+            string[] includeTags = null,
+            string[] excludeTags = null,
+            //object headers = null,
+            int waitFor = 0,
+            bool mobile = false,
+            bool skipTlsVerification = false,
+            int timeout = 30000
+            //object extract = null,
+            //object[] actions = null
+        );
+
         Task<string> MapPageAsync(
            string url,
            string? search = null,
