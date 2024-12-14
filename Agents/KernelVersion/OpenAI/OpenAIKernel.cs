@@ -94,7 +94,7 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion.OpenAi
             Dictionary<int, int> tokenSelectionBiases
         )
         {
-            _settings = new()
+            _settings = new OpenAIPromptExecutionSettings()
             {
                 FunctionChoiceBehavior = functionChoiceBehavior,
 
