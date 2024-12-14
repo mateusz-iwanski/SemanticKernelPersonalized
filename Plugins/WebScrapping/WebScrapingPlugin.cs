@@ -15,12 +15,63 @@ namespace SemanticKernelPersonalized.Plugins.WebScrapping
     )
     {
         [KernelFunction("scraping_we_page")]
-        [Description("Scrapes the content of a web page using external an online service.")]
+        [Description("Scrapes the content of a web page using an external online service.")]
         public async Task<string> ScrapingPageAsync(
-            [Description("Url/Link/Uri page to scrap")] string url
-            )
+            [Description("The URL to scrape. Required parameter.")] 
+            string url,
+            [Description("Formats to include in the output. " +
+                        "Available options: markdown, html, rawHtml, links, screenshot, extract, screenshot@fullPage. " +
+                        "Default is markdown.")]
+            string[]? formats = null,
+            [Description("Only return the main content of the page excluding headers, navs, footers, etc. Default is true.")]
+            bool onlyMainContent = true,
+            [Description("Tags to include in the output.")]
+            string[] includeTags = null,
+            [Description("Tags to exclude from the output.")]
+            string[] excludeTags = null,
+            //[Description("Headers to send with the request. Can be used to send cookies, user-agent, etc.")]
+            //object headers = null,
+            [Description("Specify a delay in milliseconds before fetching the content, allowing the page sufficient time to load. Default is 0.")]
+            int waitFor = 0,
+            [Description("Set to true if you want to emulate scraping from a mobile device. Useful for testing responsive pages and taking mobile screenshots. Default is false.")]
+            bool mobile = false,
+            [Description("Skip TLS certificate verification when making requests. Default is false.")]
+            bool skipTlsVerification = false,
+            [Description("Timeout in milliseconds for the request. Default is 30000.")]
+            int timeout = 30000
+            //[Description("Extract object containing extraction parameters.")]
+            //object extract = null,
+            //[Description("Actions to perform on the page before grabbing the content.")]
+            //object[] actions = null
+        )
         {
-            return await webSpracping.ScrapingPageAsync(url);
+            // Define the supported formats
+            var supportedFormats = new[] { "markdown", "html", "rawHtml", "links", "screenshot", "extract", "screenshot@fullPage" };
+
+            // Check if the requested formats are supported
+            if (formats != null && formats.Any(format => !supportedFormats.Contains(format)))
+            {
+                return "The requested format(s) are not supported for scraping. Supported formats are: " +
+                    string.Join(", ", supportedFormats);
+            }
+
+            // Call the updated ScrapingPageAsync method with the provided parameters
+            var response = await webSpracping.ScrapingPageAsync(
+                url,
+                formats,
+                onlyMainContent,
+                includeTags,
+                excludeTags,
+                //headers,
+                waitFor,
+                mobile,
+                skipTlsVerification,
+                timeout
+                //extract,
+                //actions
+            );
+
+            return response;
         }
 
         [KernelFunction("map_we_page")]
