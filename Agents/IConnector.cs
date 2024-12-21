@@ -1,6 +1,7 @@
 ﻿using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
+using SemanticKernelPersonalized.AgentsManagement;
 
 namespace SemanticKernelPersonalized.Agents
 {
@@ -21,5 +22,6 @@ namespace SemanticKernelPersonalized.Agents
             Dictionary<int, int> tokenSelectionBiases
         );
         public OpenAIPromptExecutionSettings GetPromptExecutionSettings();
+        public ChatDialog getConversationHistory();
     }
 }
