@@ -96,11 +96,17 @@ namespace SemanticKernelPersonalized
             Console.WriteLine("Hello World!");
 
             var openai = host.Services.GetService<OpenAIKernel>();
-            var logger = host.Services.GetRequiredService<ILogger<ChatDialog>>();
-            ChatDialog chatDialogKernel = new ChatDialog(openai, logger);
+            //var logger = host.Services.GetRequiredService<ILogger<ChatDialog>>();
+            //ChatDialog chatDialogKernel = new ChatDialog(openai, logger);
             //chatDialogKernel.AddSystemMessage("You are helpful assistant.");
             //var k = await chatDialogKernel.GetChatMessageContentAsync("pobierz url z www.rtk.pl/onas");
-            var k = await chatDialogKernel.GetChatMessageContentAsync("pobierz treść strony z www.rtk.pl/onas w formacie json");
+            //var k = await chatDialogKernel.GetChatMessageContentAsync(
+
+            //var k = await openai.ChatAsync("pobierz treść strony z www.rtk.pl/onas w formacie json.");
+            //var k = await openai.ChatAsync("pobierz url z www.rtk.pl/onas");
+
+            var k = await openai.ChatAsync("cześć, jak się masz?");
+
             //var k = await chatDialogKernel.GetChatMessageContentAsync("show registered plugins");
             Console.WriteLine("Assistant: " + k.Content);
 
@@ -116,7 +122,7 @@ namespace SemanticKernelPersonalized
                 var userInput = Console.ReadLine();
                 if (string.IsNullOrEmpty(userInput)) continue;
 
-                var response = await chatDialogKernel.GetChatMessageContentAsync(userInput);
+                var response = await openai.ChatAsync(userInput);
                 Console.WriteLine("Assistant: " + response.Content);
             }
 
