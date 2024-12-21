@@ -12,6 +12,7 @@ using Microsoft.SemanticKernel.ChatCompletion;
 using Microsoft.SemanticKernel.Connectors.OpenAI;
 using Microsoft.SemanticKernel.Services;
 using OpenAI.Models;
+using SemanticKernelPersonalized.AgentsManagement;
 using SemanticKernelPersonalized.Plugins.WebScrapping;
 using SemanticKernelPersonalized.Settings;
 
@@ -32,6 +33,8 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion.OpenAi
         private readonly IOptions<FirecrawlSemanticSettings> _firecrawlSemanticSettings;
         private OpenAIPromptExecutionSettings _settings = new() { FunctionChoiceBehavior = FunctionChoiceBehavior.Auto() };
 
+        private readonly ChatDialog _chatDialog;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="OpenAIKernel"/> class with default settings.
         /// If you want to change the default model ID settings, use the <see cref="CustomizeModel"/> method.
@@ -50,13 +53,49 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion.OpenAi
             )
         {
             _openAISettings = openAISettings;
-            _firecrawlSemanticSettings = firecrawlSemanticSettings;
+            _chatDialog = new ChatDialog(this, new Microsoft.Extensions.Logging.Abstractions.NullLogger<ChatDialog>());
+
+            _firecrawlSemanticSettings = firecrawlSemanticSettings;            
 
             _kernel = new KernelBuilder().CreateKernelWithOpenAIChatCompletion(
                 modelId: _openAISettings.Value.DefaultModelId,
                 modelApiKey: _openAISettings.Value.ApiKey,
-                firecrawlSemanticSettings: _firecrawlSemanticSettings
+                chatDialog: _chatDialog,
+                firecrawlSemanticSettings: _firecrawlSemanticSettings                
                 );
+
+            _chatDialog = new ChatDialog(this, new Microsoft.Extensions.Logging.Abstractions.NullLogger<ChatDialog>());
+
+        }
+
+
+        public ChatDialog getConversationHistory() => _chatDialog;
+
+        public async Task<ChatMessageContent> ChatAsync(
+            string message,
+            PromptExecutionSettings? promptExecutionSettings = null,
+            Kernel? kernel = null,
+            Dictionary<string, object>? messageAdditionalMetadata = null,
+            string? source = null,
+            string? name = null,
+            string? mimeType = null,
+            string? outputMimeType = null,
+            string? author = null
+            )
+        {
+            var response = await _chatDialog.GetChatMessageContentAsync(
+                message,
+                promptExecutionSettings,
+                kernel,
+                messageAdditionalMetadata,
+                source,
+                name,
+                mimeType,
+                outputMimeType,
+                author
+                );
+            
+            return response;
         }
 
         /// <summary>
@@ -68,6 +107,7 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion.OpenAi
             _kernel = new KernelBuilder().CreateKernelWithOpenAIChatCompletion(
                 modelId: modelId,
                 modelApiKey: _openAISettings.Value.ApiKey,
+                chatDialog: _chatDialog,
                 firecrawlSemanticSettings: _firecrawlSemanticSettings
                 );
         }
