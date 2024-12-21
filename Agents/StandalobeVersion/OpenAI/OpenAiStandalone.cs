@@ -15,6 +15,7 @@ using SemanticKernelPersonalized.Settings;
 using Microsoft.Extensions.AI;
 using System.Configuration;
 using SemanticKernelPersonalized.Agents.KernelVersion;
+using SemanticKernelPersonalized.AgentsManagement;
 
 namespace SemanticKernelPersonalized.Agents.Standalone.OpenAi
 {
@@ -115,5 +116,10 @@ namespace SemanticKernelPersonalized.Agents.Standalone.OpenAi
 
         // Standalone version doesn't have a kernel
         public Kernel? GetKernel() => null;
+
+        public ChatDialog getConversationHistory()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
