@@ -26,7 +26,7 @@ namespace SemanticKernelPersonalized.AgentsManagement
     /// Kernel, data from ChatDialog->ChatHistory should also be saved in another system. Data can be associated using the agent response id (gen_ai.response.id) saved in both systems.
     /// Connect data in the your systems - ChatHistory[]->(where role == assistant)->Metadata->gen_ai.response.id and conversation_uuid with the whole conversation.
     /// </remarks>
-    internal class ChatDialog : ChatDialogBase, IChatDialogBase
+    public class ChatDialog : ChatDialogBase, IChatDialogBase
     {
         private readonly IConnector _connector;
 
@@ -51,6 +51,7 @@ namespace SemanticKernelPersonalized.AgentsManagement
                 throw new InvalidOperationException("Chat history is not initialized.");
             }
 
+            // if it's a standalone version, it will return null
             Kernel? kernel = _connector.GetKernel();
             ChatMessageContent response = null;
 
