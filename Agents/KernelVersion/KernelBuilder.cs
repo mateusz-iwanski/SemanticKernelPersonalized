@@ -3,6 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
 using Microsoft.SemanticKernel;
+using SemanticKernelPersonalized.AgentsManagement;
+using SemanticKernelPersonalized.Plugins;
 using SemanticKernelPersonalized.Plugins.General;
 using SemanticKernelPersonalized.Plugins.WebScrapping;
 using SemanticKernelPersonalized.Settings;
@@ -18,16 +20,20 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion
     public class KernelBuilder
     {
         private Kernel _kernel { get; set; }
+        private ChatDialog _chatDialog { get; set; }
 
         public KernelBuilder() { return; }
 
         public Kernel CreateKernelWithOpenAIChatCompletion(
             string modelId, 
             string modelApiKey,
-            IOptions<FirecrawlSemanticSettings>? firecrawlSemanticSettings = null
+            ChatDialog chatDialog,
+            IOptions<FirecrawlSemanticSettings>? firecrawlSemanticSettings = null            
             )
         {
             var builder = Kernel.CreateBuilder();
+
+            _chatDialog = chatDialog;
 
             builder.AddOpenAIChatCompletion(
                 modelId,
@@ -79,6 +85,7 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion
            )
         {
             kernel.Plugins.AddFromObject(new PluginExplorerPlugin(kernel));
+            //kernel.Plugins.AddFromObject(new MetadataGenerator(kernel));
         }
 
 
