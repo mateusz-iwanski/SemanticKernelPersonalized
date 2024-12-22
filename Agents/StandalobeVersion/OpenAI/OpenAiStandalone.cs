@@ -117,7 +117,7 @@ namespace SemanticKernelPersonalized.Agents.Standalone.OpenAi
         // Standalone version doesn't have a kernel
         public Kernel? GetKernel() => null;
 
-        public ChatDialog getConversationHistory()
+        public ChatDialog GetConversationHistory()
         {
             throw new NotImplementedException();
         }
