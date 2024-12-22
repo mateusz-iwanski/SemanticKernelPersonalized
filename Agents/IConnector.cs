@@ -22,6 +22,6 @@ namespace SemanticKernelPersonalized.Agents
             Dictionary<int, int> tokenSelectionBiases
         );
         public OpenAIPromptExecutionSettings GetPromptExecutionSettings();
-        public ChatDialog getConversationHistory();
+        public ChatDialog GetConversationHistory();
     }
 }
