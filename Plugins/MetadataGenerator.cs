@@ -25,7 +25,7 @@ namespace SemanticKernelPersonalized.Plugins
         //public string GetChatHistory()
         //{
         //    // how to get chathistory from chatCompletion?
-        //    //return  JsonSerializer.Serialize(connector.getConversationHistory().GetHistory());
+        //    //return  JsonSerializer.Serialize(connector.GetConversationHistory().GetHistory());
         //}
 
 
