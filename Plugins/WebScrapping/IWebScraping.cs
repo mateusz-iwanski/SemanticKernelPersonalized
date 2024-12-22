@@ -12,9 +12,13 @@
             int waitFor = 0,
             bool mobile = false,
             bool skipTlsVerification = false,
-            int timeout = 30000
+            int timeout = 30000,
             //object extract = null,
             //object[] actions = null
+            bool removeBase64Images = true,
+            ActionWaitMiliseconds actionWaitMiliseconds = null,
+            ActionWaitSelector actionWaitSelector = null
+
         );
 
         Task<string> MapPageAsync(
