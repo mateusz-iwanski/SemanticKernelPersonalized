@@ -69,7 +69,7 @@ namespace SemanticKernelPersonalized.Agents.KernelVersion.OpenAi
         }
 
 
-        public ChatDialog getConversationHistory() => _chatDialog;
+        public ChatDialog GetConversationHistory() => _chatDialog;
 
         public async Task<ChatMessageContent> ChatAsync(
             string message,
