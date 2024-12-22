@@ -48,6 +48,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using SemanticKernelPersonalized.Plugins.WebScrapping;
 using SemanticKernelPersonalized.Settings;
+using System.ComponentModel;
 using System.Net.Http.Headers;
 using System.Text;
 
@@ -110,9 +111,12 @@ public class Firecrawl : IWebScraping
         int waitFor = 0,
         bool mobile = false,
         bool skipTlsVerification = false,
-        int timeout = 30000
+        int timeout = 30000,
         //object extract = null,
         //object[] actions = null
+        bool removeBase64Images = true,
+        ActionWaitMiliseconds actionWaitMiliseconds = null,
+        ActionWaitSelector actionWaitSelector = null
         )
     {
         var supportedFormats = new[] { "markdown", "html", "rawHtml", "links", "screenshot", "extract", "screenshot@fullPage" };
@@ -122,6 +126,17 @@ public class Firecrawl : IWebScraping
         {
             throw new ArgumentException("The requested format(s) are not supported for scraping. Supported formats are: " +
                 string.Join(", ", supportedFormats));
+        }
+
+        var actions = new List<object> { };
+
+        if (actionWaitMiliseconds != null)
+        {
+            actions.Add(actionWaitMiliseconds);
+        }
+        if (actionWaitSelector != null)
+        {
+            actions.Add(actionWaitSelector);
         }
 
         // Construct the request payload with all available options
@@ -139,7 +154,11 @@ public class Firecrawl : IWebScraping
             timeout = timeout,  // Timeout for the request
             //extract = extract,  // Extract object containing extraction parameters
             //actions = actions  // Actions to perform on the page before grabbing the content
+            removeBase64Images = removeBase64Images,  // Remove base64 images from the output
+            actions = actions
         };
+
+        var k = JsonConvert.SerializeObject(payload);
 
         // Serialize payload to JSON and prepare the HTTP content
         var content = new StringContent(
@@ -180,7 +199,7 @@ public class Firecrawl : IWebScraping
         string? search = null,
         bool ignoreSitemap = false,
         bool sitemapOnly = false,
-        bool includeSubdomains = false,
+        bool includeSubdomains = true,
         int limit = 5000
     )
     {
