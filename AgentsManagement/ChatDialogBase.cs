@@ -10,13 +10,30 @@ using System.Threading.Tasks;
 
 namespace SemanticKernelPersonalized.AgentsManagement
 {
+    /// <summary>
+    /// Abstract base class for managing chat dialogs.
+    /// </summary>
     public abstract class ChatDialogBase
     {
+        /// <summary>
+        /// Gets or sets the chat history.
+        /// </summary>
         protected ChatHistory _chatHistory { get; set; }
+
+        /// <summary>
+        /// Gets or sets the logger instance.
+        /// </summary>
         protected ILogger<IChatDialogBase> _logger { get; set; }
 
+        /// <summary>
+        /// Gets the unique identifier for the chat session.
+        /// </summary>
         public readonly Guid Uuid;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ChatDialogBase"/> class.
+        /// </summary>
+        /// <param name="logger">The logger instance.</param>
         public ChatDialogBase(ILogger<IChatDialogBase> logger)
         {
             _chatHistory = new ChatHistory();
@@ -24,23 +41,35 @@ namespace SemanticKernelPersonalized.AgentsManagement
             Uuid = Guid.NewGuid();
         }
 
+        /// <summary>
+        /// Sends a chat message and gets a response asynchronously.
+        /// </summary>
+        /// <returns>The response from the chat completion service.</returns>
         abstract protected Task<ChatMessageContent> Chat();
 
+        /// <summary>
+        /// Gets the model identifier.
+        /// </summary>
+        /// <returns>The model identifier.</returns>
         abstract public string GetModelId();
 
         /// <summary>
-        /// Add request history -> sends a chat message and gets a response asynchronously -> add assistant history.
+        /// Adds a user message to the chat history, sends a chat message, and gets a response asynchronously.
         /// </summary>
         /// <param name="message">The message to send as plain text.</param>
         /// <param name="promptExecutionSettings">Provides execution settings for an AI request.</param>
         /// <param name="kernel">State for use throughout a Semantic Kernel workload.</param>
-        /// <param name="messageAdditionalMetadata">Additional metadata for the message (whatever you want).</param>
-        /// <param name="source">The source of the message (www, email, etc.).</param>
-        /// <param name="name">The name of the message (greeting, trigger, system_notification, error, etc.).</param>
-        /// <param name="mimeType">The MIME type of the message (use MimeTypes).</param>
-        /// <param name="outputMimeType">The MIME type of the output message (use MimeTypes).</param>
-        /// <param name="author">The author of the message.</param>
+        /// <param name="messageAdditionalMetadata">Additional metadata for the message (optional).</param>
+        /// <param name="source">The source of the message (optional).</param>
+        /// <param name="name">The name of the message (optional).</param>
+        /// <param name="mimeType">The MIME type of the message (optional).</param>
+        /// <param name="outputMimeType">The MIME type of the output message (optional).</param>
+        /// <param name="author">The author of the message (optional).</param>
         /// <returns>The response from the chat completion service.</returns>
+        /// <remarks>
+        /// The conversation is marked in additional information with `gen_ai.response.id`, i.e., the conversation id from the AI agent response.
+        /// This id can be used to merge information between the logging system (e.g., Application Insights) and another system that records the necessary information.
+        /// </remarks>
         public virtual async Task<ChatMessageContent> GetChatMessageContentAsync(
             string message,
             PromptExecutionSettings? promptExecutionSettings = null,
@@ -75,7 +104,7 @@ namespace SemanticKernelPersonalized.AgentsManagement
                 AuthorRole.Assistant,
                 response.Content, // Fix: Use response.Content instead of response
                 this,
-                new Dictionary<string, object?>() { { "gen_ai.response.id", agentAiResponseId } },
+                new Dictionary<string, object?>() { { "gen_ai.response.id", agentAiResponseId } },  // mark conversation
                 GetModelId(),
                 name,
                 mimeType,
@@ -86,19 +115,21 @@ namespace SemanticKernelPersonalized.AgentsManagement
         }
 
         /// <summary>
-        /// Adds a system message to the chat history.
+        /// Adds a message to the chat history.
         /// </summary>
-        /// <param name="message">The message to send as plain text.</param>
-        /// <param name="messageAdditionalMetadata">Additional metadata for the message (whatever you want).</param>
-        /// <param name="source">The source of the message (www, email, etc.).</param>
-        /// <param name="name">The name of the message (greeting, trigger, system_notification, error, etc.).</param>
-        /// <param name="mimeType">The MIME type of the message (use MimeTypes).</param>
-        /// <param name="author">The author of the message.</param>
+        /// <param name="role">The role of the message author (User, Assistant, System).</param>
+        /// <param name="message">The message content.</param>
+        /// <param name="dialog">The chat dialog instance.</param>
+        /// <param name="messageAdditionalMetadata">Additional metadata for the message (optional).</param>
+        /// <param name="source">The source of the message (optional).</param>
+        /// <param name="name">The name of the message (optional).</param>
+        /// <param name="mimeType">The MIME type of the message (optional).</param>
+        /// <param name="author">The author of the message (optional).</param>
         public virtual void addMessage(
             AuthorRole role,
             string message,
             ChatDialogBase dialog,
-            Dictionary<string, object?>? messageAdditionalMetadata = null,            
+            Dictionary<string, object?>? messageAdditionalMetadata = null,
             string? source = null,
             string? name = null,
             string? mimeType = null,
@@ -117,8 +148,18 @@ namespace SemanticKernelPersonalized.AgentsManagement
                 author: author
                 );
         }
+
+        /// <summary>
+        /// Adds a system message to the chat history.
+        /// </summary>
+        /// <param name="message">The message content.</param>
+        /// <param name="messageAdditionalMetadata">Additional metadata for the message (optional).</param>
+        /// <param name="source">The source of the message (optional).</param>
+        /// <param name="name">The name of the message (optional).</param>
+        /// <param name="mimeType">The MIME type of the message (optional).</param>
+        /// <param name="author">The author of the message (optional).</param>
         public virtual void AddSystemMessage(
-            string message,            
+            string message,
             Dictionary<string, object?>? messageAdditionalMetadata = null,
             string? source = null,
             string? name = null,
@@ -136,7 +177,7 @@ namespace SemanticKernelPersonalized.AgentsManagement
                 mimeType,
                 author
                 );
-        }        
+        }
 
         /// <summary>
         /// Clears the chat history.
@@ -150,9 +191,9 @@ namespace SemanticKernelPersonalized.AgentsManagement
         public virtual ChatHistory GetHistory() => _chatHistory;
 
         /// <summary>
-        /// Gets the UUID.
+        /// Gets the unique identifier for the chat session.
         /// </summary>
+        /// <returns>The unique identifier.</returns>
         public virtual Guid GetUuid() => Uuid;
-
     }
 }
