@@ -105,7 +105,10 @@ namespace SemanticKernelPersonalized
             //var k = await openai.ChatAsync("pobierz treść strony z www.rtk.pl/onas w formacie json.");
             //var k = await openai.ChatAsync("pobierz url z www.rtk.pl/onas");
 
-            var k = await openai.ChatAsync("cześć, jak się masz?");
+            //var k = await openai.ChatAsync("pobierz url z www.rtk.pl");
+
+
+            var k = await openai.ChatAsync("poczekaj 10 milisekund i pobierz dane z www.rtk.pl");
 
             //var k = await chatDialogKernel.GetChatMessageContentAsync("show registered plugins");
             Console.WriteLine("Assistant: " + k.Content);
